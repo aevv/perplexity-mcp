@@ -6,17 +6,25 @@ and get answers via the Perplexity API.
 """
 
 import os
+import sys
 from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel, Field
 import httpx
 import json
 
-# Initialize MCP server
-mcp = FastMCP("perplexity_mcp")
-
 # Configuration
 API_KEY = os.getenv("PERPLEXITY_API_KEY")
 API_BASE_URL = "https://api.perplexity.ai"
+
+# Check if HTTP transport is requested
+if len(sys.argv) > 1 and sys.argv[1] == "--http":
+    # HTTP transport mode - initialize with custom host/port
+    host = os.getenv("HOST", "0.0.0.0")
+    port = int(os.getenv("PORT", "8000"))
+    mcp = FastMCP("perplexity_mcp", host=host, port=port)
+else:
+    # Default: stdio transport
+    mcp = FastMCP("perplexity_mcp")
 
 
 class AskInput(BaseModel):
@@ -145,4 +153,11 @@ async def ask_perplexity(params: AskInput) -> str:
 
 
 if __name__ == "__main__":
-    mcp.run()
+    # Check if HTTP transport is requested
+    if len(sys.argv) > 1 and sys.argv[1] == "--http":
+        # HTTP transport mode
+        print(f"Starting Perplexity MCP Server with HTTP transport on {mcp.settings.host}:{mcp.settings.port}")
+        mcp.run(transport="streamable-http")
+    else:
+        # Default: stdio transport
+        mcp.run()

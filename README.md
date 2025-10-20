@@ -43,13 +43,45 @@ This repository was generated with Claude Sonnet 4.5
 
 ### Running the Server
 
-Start the MCP server with stdio transport:
+**STDIO Transport (default):**
 
 ```bash
 python perplexity_mcp.py
 ```
 
 The server will start and wait for requests over stdin/stdout.
+
+**HTTP Transport:**
+
+```bash
+python perplexity_mcp.py --http
+```
+
+The server will start with HTTP transport on `0.0.0.0:8000` (default). You can customize the host and port using environment variables:
+
+```bash
+HOST=127.0.0.1 PORT=9000 python perplexity_mcp.py --http
+```
+
+**HTTP Transport with Docker:**
+
+```bash
+docker run -p 8000:8000 \
+  -e PERPLEXITY_API_KEY="${PERPLEXITY_API_KEY}" \
+  perplexity-mcp \
+  python perplexity_mcp.py --http
+```
+
+Custom host/port:
+
+```bash
+docker run -p 9000:9000 \
+  -e PERPLEXITY_API_KEY="${PERPLEXITY_API_KEY}" \
+  -e HOST=0.0.0.0 \
+  -e PORT=9000 \
+  perplexity-mcp \
+  python perplexity_mcp.py --http
+```
 
 ### Tools Available
 
@@ -143,7 +175,7 @@ Check the docs for that specific tool, the MCP setup will be similar to Claude C
 
 ## Notes
 
-- This is a simple, local-only server designed for personal use
+- This is a simple server designed for personal use
 - The server uses async/await for non-blocking I/O
 - Responses are limited by the Perplexity API's capabilities and rate limits
-- The server respects the MCP protocol's stdio transport
+- The server supports both stdio and HTTP (streamable-http) transports
