@@ -27,12 +27,12 @@ This repository was generated with Claude Sonnet 4.5
    docker build -t perplexity-mcp .
    ```
 
-2. **Run with docker-compose (recommended):**
+2. **Set your API key:**
    ```bash
-   PERPLEXITY_API_KEY="${PERPLEXITY_API_KEY}"
+   export PERPLEXITY_API_KEY="your-api-key-here"
    ```
 
-   Run directly with Docker:
+3. **Run with docker (recommended):**
    ```bash
    docker run -it \
      -e PERPLEXITY_API_KEY="${PERPLEXITY_API_KEY} \
