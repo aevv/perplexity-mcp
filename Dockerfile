@@ -1,18 +1,12 @@
-FROM python:3.11-slim
-
+FROM rust:1-alpine AS build
+RUN apk add --no-cache musl-dev cmake make perl
 WORKDIR /app
+COPY Cargo.toml Cargo.lock ./
+COPY src ./src
+RUN cargo build --release
 
-# Copy requirements and install dependencies
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the MCP server
-COPY perplexity_mcp.py .
-
-# Expose port for HTTP transport (default: 8000)
+FROM gcr.io/distroless/static-debian12
+COPY --from=build /app/target/release/perplexity-mcp /perplexity-mcp
+ENV HOST=0.0.0.0
 EXPOSE 8000
-
-# Run the server (use CMD to allow easy override)
-# Default: stdio transport
-# For HTTP: docker run -p 8000:8000 perplexity-mcp python perplexity_mcp.py --http
-CMD ["python", "perplexity_mcp.py"]
+ENTRYPOINT ["/perplexity-mcp"]
